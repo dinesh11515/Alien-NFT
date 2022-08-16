@@ -12,6 +12,7 @@ contract fiverNFT is ERC721Enumerable, Ownable {
 
     string _baseTokenURI = "";
     string baseExtension = ".json";
+    string originalUri = "";
 
     bool public _paused;
 
@@ -24,7 +25,7 @@ contract fiverNFT is ERC721Enumerable, Ownable {
 
     mapping(address => bool) public whitelisted;
     mapping(address => bool) public giveawayWinners;
-    address[] public whitelistedAddresses;
+    address[] whitelistedAddresses;
     
     modifier onlyWhenNotPaused {
         require(!_paused, "Contract currently paused");
@@ -43,16 +44,17 @@ contract fiverNFT is ERC721Enumerable, Ownable {
     }
 
     function addAddress(address[] memory _address) public onlyOwner {
-        for (uint8 i = 0; i < _address.length; i++) {
+        for (uint8 i = 0; i < _address.length) {
             require(!whitelisted[_address[i]], "Address has already been whitelisted");
             require(numAddressesWhitelisted < maxWhitelistedAddresses, "More addresses cant be added, limit reached");
             whitelisted[_address[i]] = true;
-            whitelistedAddresses.push(_address[i]);
+            whitelistedAddresses.psetBaseTokenURIush(_address[i]);
             numAddressesWhitelisted += 1;
+            unchecked{ i++; }
         }
     }
 
-    function whitelistedAddressesList() public view returns (address[] memory) {
+    function whitelistedAddressesList() public view returns (address[] memory) onlyOwner{
         return whitelistedAddresses;
     }
 
@@ -68,23 +70,24 @@ contract fiverNFT is ERC721Enumerable, Ownable {
 
     function mintBundle(address[] memory addresses) public onlyWhenNotPaused onlyOwner{
         require(addresses.length+tokenIds < maxTokenIds,"Exceed maximum supply");
-        for(uint8 i=0;i< addresses.length;i++){
+        for(uint8 i=0;i< addresses.length;){
             tokenIds += 1;
             _safeMint(addresses[i], tokenIds);
             giveawayWinners[addresses[i]]=true;
             giveawayWinnersCount += 1;
+            unchecked{ i++; }
         }
     }
 
-    function setBaseTokenURI(string memory URI) public onlyOwner{
-        _baseTokenURI = URI;
+    function reveal() public onlyOwner{
+        _baseTokenURI = originalUri;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
         return string(abi.encodePacked("ipfs://",_baseTokenURI,"/"));
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint16 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
         string memory baseURI = _baseURI();
         return string(abi.encodePacked(baseURI, tokenId.toString(),baseExtension));
