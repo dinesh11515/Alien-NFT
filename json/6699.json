@@ -1,0 +1,39 @@
+{
+    "name": "Aliens On Earth #6699",
+    "description": "Aliens On Earth is a collection of 10000 Unique NFT'S. In this collection Aliens visiting our Earth and they looking very cool with the way of our dressing style and tradition. Let's together explore the Aliens world and our world.",
+    "image": "https://bafybeihy7k4auonwvbb2uiirawodc7yplx2kq5sawrbzazvcrhkwig6xnq.ipfs.nftstorage.link/6699.png",
+    "dna": "e821a0a34370c092f76590f05d81e5943709b3ae",
+    "edition": 6699,
+    "date": 1655185129695,
+    "attributes": [
+        {
+            "trait_type": "Background",
+            "value": "Skyblue"
+        },
+        {
+            "trait_type": "Weapons",
+            "value": "Death scythe"
+        },
+        {
+            "trait_type": "Base character",
+            "value": "Alien"
+        },
+        {
+            "trait_type": "Eye wear",
+            "value": "Aviator"
+        },
+        {
+            "trait_type": "Head wear",
+            "value": "Casual cap"
+        },
+        {
+            "trait_type": "Dresses",
+            "value": "BlackT"
+        },
+        {
+            "trait_type": "Mouth wear",
+            "value": "Confused"
+        }
+    ],
+    "compiler": "HashLips Art Engine"
+}

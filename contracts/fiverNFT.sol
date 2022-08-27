@@ -7,12 +7,11 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 
 contract fiverNFT is ERC721Enumerable, Ownable {
-
-    using Strings for uint256;
-
-    string _baseTokenURI = "";
+    
+    using Strings for uint;
+    string _baseTokenURI = "bafybeico2zqeqeb5cau5aj7b7ouek326w65g3jbhhamsnh637vbm5z5i3q";
     string baseExtension = ".json";
-    string originalUri = "";
+    string originalUri = "bafybeigm4w5nt5nv3w37xyl63ldazwypu7yq5g6pt7oulplhes2rj557xq";
 
     bool public _paused;
 
@@ -32,46 +31,52 @@ contract fiverNFT is ERC721Enumerable, Ownable {
         _;
     }
 
-    constructor () ERC721("FiverNFT", "FNT") {}
+    constructor () ERC721("AlienNFT", "ALN") {}
 
 
-    function addAddressToWhitelist() public {
+    function addAddressToWhitelist() external onlyWhenNotPaused {
         require(!whitelisted[msg.sender], "Sender has already been whitelisted");
         require(numAddressesWhitelisted < maxWhitelistedAddresses, "More addresses cant be added, limit reached");
         whitelisted[msg.sender] = true;
         whitelistedAddresses.push(msg.sender);
-        numAddressesWhitelisted += 1;
+        unchecked {
+            numAddressesWhitelisted += 1;
+        }
     }
 
-    function addAddress(address[] memory _address) public onlyOwner {
-        for (uint8 i = 0; i < _address.length) {
+    function addAddress(address[] memory _address) external onlyOwner {
+        for (uint8 i = 0; i < _address.length;) {
             require(!whitelisted[_address[i]], "Address has already been whitelisted");
             require(numAddressesWhitelisted < maxWhitelistedAddresses, "More addresses cant be added, limit reached");
             whitelisted[_address[i]] = true;
-            whitelistedAddresses.psetBaseTokenURIush(_address[i]);
+            whitelistedAddresses.push(_address[i]);
             numAddressesWhitelisted += 1;
             unchecked{ i++; }
         }
     }
 
-    function whitelistedAddressesList() public view returns (address[] memory) onlyOwner{
+    function whitelistedAddressesList() external view onlyOwner returns (address[] memory){
         return whitelistedAddresses;
     }
 
-    function mint() public payable onlyWhenNotPaused {
+    function mint() external payable onlyWhenNotPaused {
         require(tokenIds < maxTokenIds, "Exceed maximum supply");
         require(msg.value >= _price, "Ether sent is not correct");
-        tokenIds += 1;
+        unchecked {
+            tokenIds += 1;
+        }
         address _owner = owner();
         (bool sent, ) =  _owner.call{value: msg.value}("");
         require(sent, "Failed to send Ether");
         _safeMint(msg.sender, tokenIds);
     }
 
-    function mintBundle(address[] memory addresses) public onlyWhenNotPaused onlyOwner{
+    function mintBundle(address[] memory addresses) external onlyWhenNotPaused onlyOwner{
         require(addresses.length+tokenIds < maxTokenIds,"Exceed maximum supply");
         for(uint8 i=0;i< addresses.length;){
-            tokenIds += 1;
+            unchecked {
+                tokenIds += 1;
+            }
             _safeMint(addresses[i], tokenIds);
             giveawayWinners[addresses[i]]=true;
             giveawayWinnersCount += 1;
@@ -79,21 +84,25 @@ contract fiverNFT is ERC721Enumerable, Ownable {
         }
     }
 
-    function reveal() public onlyOwner{
+    function reveal() external onlyOwner{
         _baseTokenURI = originalUri;
+    }
+
+    function withdraw() external{
+        payable(owner()).transfer(address(this).balance);
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
         return string(abi.encodePacked("ipfs://",_baseTokenURI,"/"));
     }
 
-    function tokenURI(uint16 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
         string memory baseURI = _baseURI();
         return string(abi.encodePacked(baseURI, tokenId.toString(),baseExtension));
     }
 
-    function setPaused(bool val) public onlyOwner {
+    function setPaused(bool val) external onlyOwner {
         _paused = val;
     }
     
